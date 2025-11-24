@@ -1,0 +1,46 @@
+# Default Configuration for System Performance Application
+# This file contains default settings for the application
+
+[app_settings]
+# Theme options: "light", "dark", "system"
+theme = "system"
+
+# Start application when Windows starts
+auto_start = false
+
+# Minimize to system tray instead of closing
+minimize_to_tray = true
+
+# Check for application updates on startup
+check_for_updates = true
+
+# Logging level: "off", "error", "warn", "info", "debug", "trace"
+log_level = "info"
+
+# How often to refresh system information (milliseconds)
+refresh_interval = 1000
+
+[monitoring]
+# Enable CPU monitoring
+monitor_cpu = true
+
+# Enable memory monitoring
+monitor_memory = true
+
+# Enable network monitoring
+monitor_network = true
+
+# Temperature monitoring (if supported)
+monitor_temperature = true
+
+[parameters]
+# Default parameter values can be defined here
+# These will be loaded on first run
+
+[profiles]
+# Example profile structure (commented out)
+# [profiles.performance]
+# name = "High Performance"
+# description = "Optimized for maximum performance"
+# cpu_min_frequency = 100  # percentage
+# cpu_max_frequency = 100  # percentage
