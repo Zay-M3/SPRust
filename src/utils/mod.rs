@@ -3,4 +3,4 @@
 // No state management, just reusable helper functions
 
 pub mod validation;
-pub mod formatters;
+pub mod vectores_strings;

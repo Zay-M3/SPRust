@@ -5,8 +5,9 @@
 
 use eframe::egui;
 
+use crate::ui::main_view;
+
 pub struct App {
-    // Application state fields
     current_view: AppView,
 }
 
@@ -30,10 +31,7 @@ impl eframe::App for App {
             // TODO: Implement main update loop
             ui.label(format!("FPS: {:.2}", fps));
             match self.current_view {
-                AppView::Main => {
-                    // Render main view
-                    crate::ui::main_view::render(ui);
-                }
+                AppView::Main => main_view::MainView::new().render(ui),
             }
         });
     }
