@@ -1,10 +1,12 @@
 
-//This is a vector for the .net versions
+//This is a vector for the .NET Framework versions (for Windows Server Features)
 pub fn get_net_versions() -> Vec<String>{
     vec![
-        "net6.0".to_string(),
-        "net7.0".to_string(),
-        "net8.0".to_string(),
+        ".NET Framework 3.5".to_string(),
+        ".NET Framework 4.5".to_string(),
+        ".NET Framework 4.6".to_string(),
+        ".NET Framework 4.7".to_string(),
+        ".NET Framework 4.8".to_string(),
     ]
 }
 

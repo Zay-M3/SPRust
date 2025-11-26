@@ -3,3 +3,4 @@
 // This is where background threads will execute I/O operations
 
 pub mod windows_api;
+pub mod command_executor;
