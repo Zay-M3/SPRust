@@ -2,38 +2,43 @@
 // Represents the application's configuration state
 // Can be serialized/deserialized to/from TOML files
 
-use std::path::PathBuf;
+use std::collections::HashMap;
+
+use crate::utils::vectores_strings::get_iis_security_features;
 
 pub struct Config {
-    // TODO: Add fields for application configuration
-    // - app_settings: AppSettings
-    // - parameter_profiles: Vec<ParameterProfile>
-    // - active_profile: Option<String>
+
+    pub app_settings: AppSettings,
 }
 
 pub struct AppSettings {
-    // TODO: Add fields for application settings
-    // - theme: Theme (Light, Dark, System)
-    // - auto_start: bool
-    // - minimize_to_tray: bool
-    // - check_for_updates: bool
-    // - log_level: LogLevel
-    // - refresh_interval: u64 (milliseconds)
+    pub server_permits_enabled: bool,
+    pub server_ddl_enabled: bool,
+    pub net_version: String,
+    pub enabled_lua: String,
+    
+    pub set_security_checkboxes: HashMap<&'static str, bool>,
+
 }
 
-pub struct ParameterProfile {
-    // TODO: Add fields for parameter profile
-    // - name: String
-    // - description: String
-    // - parameters: HashMap<String, ParameterValue>
-    // - created_at: DateTime<Utc>
-    // - modified_at: DateTime<Utc>
-}
 
 impl Config {
-    // TODO: Implement methods
-    // - default() - Create default configuration
-    // - from_file() - Load from TOML file
-    // - to_file() - Save to TOML file
-    // - validate() - Validate configuration structure
+
+    pub fn default() -> Self {
+        let mut set_security_checkboxes = HashMap::new();
+        for (id, _) in get_iis_security_features() {
+            set_security_checkboxes.insert(id, false);
+        }
+
+        Self {
+            app_settings: AppSettings {
+                server_permits_enabled: false,
+                server_ddl_enabled: false,
+                net_version: "Select .NET version".to_string(),
+                enabled_lua: "EnabledLua value".to_string(),
+                set_security_checkboxes
+            },
+        }
+    }
+
 }

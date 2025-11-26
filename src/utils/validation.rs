@@ -12,12 +12,3 @@
 // - is_admin_required(param: &Parameter) -> bool
 // - is_safe_value(value: &ParameterValue, param: &Parameter) -> bool
 
-pub fn validate_not_empty(value: &str) -> Result<(), String> {
-    // TODO: Implement
-    // if value.trim().is_empty() {
-    //     Err("Value cannot be empty".to_string())
-    // } else {
-    //     Ok(())
-    // }
-    Ok(())
-}
