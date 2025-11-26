@@ -1,5 +1,3 @@
-// Main Entry Point - Application initialization
-// This file bootstraps the application and starts the egui window
 
 // Module declarations - tells Rust about the folder structure
 mod app;
