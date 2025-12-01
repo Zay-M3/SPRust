@@ -8,8 +8,8 @@ use crate::models::config::AppSettings;
 
 pub fn commands_queue_receiver(active_command: &mut Vec<(String, Receiver<CommandStatus>)>, server_settings: &AppSettings) {
     // Implementation of commands queue receiver
-    for feacture in get_iis_security_commands_map() {
-            let (feature_id, (_label, command_fn)) = feacture;
+    for feature in get_iis_security_commands_map() {
+            let (feature_id, (_label, command_fn)) = feature;
             if let Some(enabled) = server_settings.set_security_checkboxes.get(feature_id) {
                 if *enabled {
                     let receiver = command_fn();
@@ -19,7 +19,7 @@ pub fn commands_queue_receiver(active_command: &mut Vec<(String, Receiver<Comman
     }
 }
 
-pub fn excute_commands_queue(active_command: &mut Vec<(String, Receiver<CommandStatus>)>, last_status: &mut Option<CommandStatus>, logs: &mut Vec<String>, completed: &mut Vec<usize>, ui: &egui::Ui) {
+pub fn execute_commands_queue(active_command: &mut Vec<(String, Receiver<CommandStatus>)>, last_status: &mut Option<CommandStatus>, logs: &mut Vec<String>, completed: &mut Vec<usize>, ui: &egui::Ui) {
     
     for (i, (feature_id, receiver)) in active_command.iter().enumerate() {
         if let Ok(status) = receiver.try_recv() {

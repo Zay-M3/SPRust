@@ -9,7 +9,7 @@ use crate::
     checkbox::Checkbox, selected::Selected, view_logs::ViewLogs}, 
     logic::iis_security::IISSecurityLogic, models::config::{AppSettings, Config}, 
     utils::vectores_strings::{get_enabled_lua_options, get_iis_security_features, get_net_versions},
-    hooks::{commands::{clean_commands_queue, commands_queue_receiver, excute_commands_queue}, command_executor::CommandStatus
+    hooks::{commands::{clean_commands_queue, commands_queue_receiver, execute_commands_queue}, command_executor::CommandStatus
     },};
 
 
@@ -23,7 +23,6 @@ pub struct MainView {
 
 
     //asyn operations 
-    command_reciver: Option<Receiver<CommandStatus>>,
     last_status: Option<CommandStatus>,
     active_command: Vec<(String, Receiver<CommandStatus>)>,
     logs: Vec<String>,
@@ -49,7 +48,6 @@ impl MainView {
             selected_net_version: Selected::new("Selected .NET version", get_net_versions(), egui::Id::new("selected_net_version")),
             selected_value_enabledlua: Selected::new("EnabledLua Options", get_enabled_lua_options(), egui::Id::new("selected_value_enabledlua")),
             security_checkboxes,
-            command_reciver: None,
             last_status: None,
             logs: Vec::new(),
             is_running: false,
@@ -88,18 +86,10 @@ impl MainView {
             self.on_click();
         }
 
-        // Check for command status updates
-        if let Some(receiver) = &self.command_reciver {
-            if let Ok(status) = receiver.try_recv() {
-                self.last_status = Some(status);
-                ui.ctx().request_repaint(); 
-            }
-        }
-
         let mut completed = Vec::new();
 
         // Execute commands queue
-        excute_commands_queue(
+        execute_commands_queue(
             &mut self.active_command,
             &mut self.last_status,
             &mut self.logs,

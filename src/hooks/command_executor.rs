@@ -21,7 +21,7 @@ impl CommandExecutor {
             let _ = tx.send(CommandStatus::Running(description.clone()));
             let _ = tx.send(CommandStatus::Progress(format!("Executing script...")));
 
-            
+            //Here I can used the spawned thread to run the PowerShell script
             let result = Command::new("powershell")
                 .args(&["-Command", &script])
                 .output();

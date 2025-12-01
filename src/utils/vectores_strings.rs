@@ -87,6 +87,30 @@ pub fn get_iis_security_commands_map() -> HashMap<&'static str, (&'static str, C
             IISSecurityLogic::enable_iis_client_cert_mapping as CommandFunction
         )
     );
+
+    map.insert(
+        "ip_domain_restrictions",
+        (
+            "IP and Domain Restrictions",
+            IISSecurityLogic::enable_ip_domain_restrictions as CommandFunction
+        )
+    );
+
+    map.insert(
+        "url_authorization",
+        (
+            "URL Authorization",
+            IISSecurityLogic::enable_url_authorization as CommandFunction
+        )
+    );
+
+    map.insert(
+        "windows_auth",
+        (
+            "Windows Authentication",
+            IISSecurityLogic::enable_windows_authentication as CommandFunction
+        )
+    );
     
     
     map
