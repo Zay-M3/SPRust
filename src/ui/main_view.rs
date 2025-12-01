@@ -4,9 +4,13 @@ use std::{collections::HashMap, sync::mpsc::Receiver};
 use eframe::egui;
 
 
-use crate::{components::{
-    checkbox::Checkbox, selected::Selected,
-}, logic::iis_security::IISSecurityLogic, models::config::{AppSettings, Config}, services::command_executor::CommandStatus, utils::vectores_strings::{get_enabled_lua_options, get_iis_security_features, get_net_versions}};
+use crate::
+    {components::{
+    checkbox::Checkbox, selected::Selected, view_logs::ViewLogs}, 
+    logic::iis_security::IISSecurityLogic, models::config::{AppSettings, Config}, 
+    utils::vectores_strings::{get_enabled_lua_options, get_iis_security_features, get_net_versions},
+    hooks::{commands::{clean_commands_queue, commands_queue_receiver, execute_commands_queue}, command_executor::CommandStatus
+    },};
 
 
 pub struct MainView {
@@ -19,8 +23,11 @@ pub struct MainView {
 
 
     //asyn operations 
-    command_reciver: Option<Receiver<CommandStatus>>,
     last_status: Option<CommandStatus>,
+    active_command: Vec<(String, Receiver<CommandStatus>)>,
+    logs: Vec<String>,
+    is_running: bool,
+    view_logs: ViewLogs,
 }
 
 impl MainView {
@@ -41,8 +48,11 @@ impl MainView {
             selected_net_version: Selected::new("Selected .NET version", get_net_versions(), egui::Id::new("selected_net_version")),
             selected_value_enabledlua: Selected::new("EnabledLua Options", get_enabled_lua_options(), egui::Id::new("selected_value_enabledlua")),
             security_checkboxes,
-            command_reciver: None,
             last_status: None,
+            logs: Vec::new(),
+            is_running: false,
+            view_logs: ViewLogs::new(),
+            active_command: Vec::new(),
         }
     }
 
@@ -76,41 +86,51 @@ impl MainView {
             self.on_click();
         }
 
-        // Check for command status updates
-        if let Some(receiver) = &self.command_reciver {
-            if let Ok(status) = receiver.try_recv() {
-                self.last_status = Some(status);
-                ui.ctx().request_repaint(); 
+        let mut completed = Vec::new();
+
+        // Execute commands queue
+        execute_commands_queue(
+            &mut self.active_command,
+            &mut self.last_status,
+            &mut self.logs,
+            &mut completed,
+            ui
+        );
+
+
+        // Remove completed commands
+        clean_commands_queue(&mut self.active_command, &completed);
+
+        if !self.logs.is_empty() {
+            ui.separator();
+            ui.heading("Logs:");
+            
+            let progress = if self.is_running {
+                (ui.input(|i| i.time) % 2.0 / 2.0) as f32 
+            } else {
+                1.0
+            };
+
+            self.view_logs.render(ui, &self.logs, progress, self.is_running);
+
+            if ui.button("Clear Logs").clicked() {
+                self.logs.clear();
             }
         }
 
-        if let Some(status) = &self.last_status {
-            ui.separator();
-            match status {
-                CommandStatus::Running(msg) => {
-                    ui.label(format!("⏳ {}", msg));
-                    ui.spinner(); // Shows loading spinner
-                },
-                CommandStatus::Success(msg) => {
-                    ui.colored_label(egui::Color32::GREEN, format!("✓ Success"));
-                    ui.label(msg);
-                },
-                CommandStatus::Error(msg) => {
-                    ui.colored_label(egui::Color32::RED, format!("✗ Error"));
-                    ui.label(msg);
-                },
-            }
+        if self.active_command.is_empty() && self.is_running {
+            self.is_running = false;
+            self.logs.push("All operations completed.".to_string());
         }
     }
 
     pub fn on_click(&mut self) {
-        println!("Button clicked!");
-        println!("Raw net_version value: {}", self.server_settings.net_version);
+        self.logs.clear();
+        self.logs.push("Starting installation...".to_string());
         
         // Check if user selected a valid version
         if self.server_settings.net_version.starts_with("Select") || 
-           self.server_settings.net_version.is_empty() {
-            println!("No valid .NET version selected!");
+            self.server_settings.net_version.is_empty() {
             self.last_status = Some(CommandStatus::Error(
                 "Please select a .NET Framework version first".to_string()
             ));
@@ -124,14 +144,16 @@ impl MainView {
             .unwrap_or("45")
             .replace(".", "");
         
-        println!("Parsed .NET version: {}", version_net_framework);
-        println!("Starting async command...");
-        
         let receiver = IISSecurityLogic::install_net_framework_async(version_net_framework);
-        self.command_reciver = Some(receiver);
-        self.last_status = Some(CommandStatus::Running("Initializing...".to_string()));
+        self.active_command.push((".NET Framework Installation".to_string(), receiver));
+            
+        commands_queue_receiver(
+            &mut self.active_command,
+            &self.server_settings
+        );
         
-        println!("Command started, receiver stored");
+        self.last_status = Some(CommandStatus::Running("Initializing...".to_string()));
+        self.is_running = true;
     }
     
 }

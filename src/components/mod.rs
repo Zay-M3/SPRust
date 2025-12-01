@@ -3,3 +3,4 @@
 
 pub mod checkbox;
 pub mod selected;
+pub mod view_logs;

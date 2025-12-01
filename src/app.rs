@@ -5,7 +5,9 @@
 
 use eframe::egui;
 
-use crate::ui::main_view;
+use crate::ui::{main_view, not_windows_server};
+
+use crate::hooks::detected_system::is_windows_server;
 
 pub struct App {
     current_view: AppView,
@@ -30,9 +32,14 @@ impl eframe::App for App {
         egui::CentralPanel::default().show(ctx, |ui| {
             // TODO: Implement main update loop
             ui.label(format!("FPS: {:.2}", fps));
-            match self.current_view {
-                AppView::Main => main_view::MainView::new().render(ui),
+            if is_windows_server().is_some() {
+                match self.current_view {
+                    AppView::Main => main_view::MainView::new().render(ui),
+                }
+            } else {
+                not_windows_server::NotWindows::new().render(ui);
             }
         });
     }
+
 }

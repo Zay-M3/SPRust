@@ -6,3 +6,5 @@ edition = "2024"
 [dependencies]
 eframe = "0.27"
 egui = "0.27"
+sysinfo = "0.30"
+ 
