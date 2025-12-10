@@ -1,3 +1,4 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 // Module declarations - tells Rust about the folder structure
 mod app;
@@ -12,9 +13,6 @@ mod hooks;
 use eframe::egui;
 
 fn main() -> eframe::Result<()> {
-    // TODO: Initialize logging
-    // env_logger::init();
-    
     // Configure window options
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
